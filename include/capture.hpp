@@ -32,7 +32,7 @@ private:
 
     //these integers are so verbose for best practices.
     //they're defined in the header because they're needed in the .cpp file, but they don't need to be mutable or visible outside of this class, so they're private and static. 
-    //static to avoid magic numbers, constexpr to allow compile-time optimization, and unsigned because they can't be negative.
+    //static purely so that constexpr doesnt return an error, constexpr to allow compile-time optimization, and unsigned because they can't be negative.
     // ~0.1ms of samples per USB transfer
     static constexpr unsigned int TRANSFER_SAMPLES = 4096;
 
