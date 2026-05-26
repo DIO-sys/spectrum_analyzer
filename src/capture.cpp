@@ -32,30 +32,39 @@ void CaptureThread::run() {
         return;
     }
 
+    uint64_t current_freq = 0;
+    int      current_gain = -1;
+
     cout << "[capture] streaming\n";
 
     while (state_.running.load()) {
-        // pick up freq/gain changes from UI
-        uint64_t freq = state_.center_freq_hz.load();
-        int      gain = state_.gain_db.load();
+        // only issue USB control commands when values actually change
+        uint64_t new_freq = state_.center_freq_hz.load();
+        int      new_gain = state_.gain_db.load();
 
-        status = bladerf_set_frequency(dev_, BLADERF_CHANNEL_RX(0), freq);
-        if (status != 0) {
-            log_error("set_frequency", status);
-            state_.running.store(false);
-            break;
+        if (new_freq != current_freq) {
+            status = bladerf_set_frequency(dev_, BLADERF_CHANNEL_RX(0), new_freq);
+            if (status != 0) {
+                log_error("set_frequency", status);
+                state_.running.store(false);
+                break;
+            }
+            current_freq = new_freq;
         }
 
-        status = bladerf_set_gain(dev_, BLADERF_CHANNEL_RX(0), gain);
-        if (status != 0) {
-            log_error("set_gain", status);
-            state_.running.store(false);
-            break;
+        if (new_gain != current_gain) {
+            status = bladerf_set_gain(dev_, BLADERF_CHANNEL_RX(0), new_gain);
+            if (status != 0) {
+                log_error("set_gain", status);
+                state_.running.store(false);
+                break;
+            }
+            current_gain = new_gain;
         }
 
         // blocking read — fills raw_buf_ with interleaved int16 I/Q pairs
         status = bladerf_sync_rx(dev_, raw_buf_.data(), TRANSFER_SAMPLES,
-                                 nullptr, 3500);
+                                 nullptr, 5000);
         if (status != 0) {
             log_error("bladerf_sync_rx", status);
             state_.running.store(false);
@@ -118,10 +127,10 @@ bool CaptureThread::configure_device() {
     // must be called before bladerf_enable_module
     status = bladerf_sync_config(dev_, BLADERF_RX_X1,
                                  BLADERF_FORMAT_SC16_Q11,
-                                 16,               // num_buffers
+                                 32,               // num_buffers — more buffering
                                  TRANSFER_SAMPLES,
-                                 8,                // num_transfers
-                                 3500);            // timeout ms
+                                 4,                // num_transfers — was 8, reduce USB pressure
+                                 5000);            // timeout ms — give more time
     if (status != 0) {
         log_error("sync_config", status);
         return false;
