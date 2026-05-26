@@ -4,6 +4,9 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/include",
+                "${workspaceFolder}/third_party/imgui",
+                "${workspaceFolder}/third_party/imgui/backends",
+                "${workspaceFolder}/third_party/implot",
                 "/usr/include",
                 "/usr/local/include"
             ],

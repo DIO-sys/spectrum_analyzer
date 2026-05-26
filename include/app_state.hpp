@@ -17,6 +17,7 @@ struct AppState {
     std::atomic<bool>     peak_hold_reset { false }; // one-shot, cleared by processing
 
     std::atomic<bool>     running         { true };
+    std::atomic<int>      total_frames    { 0 };   // incremented by processing each Welch flush
 
     // psd output — processing writes, display reads
     std::mutex            psd_mutex;
@@ -24,7 +25,7 @@ struct AppState {
     std::vector<float>    peak_dbm;
 
     // flat row-major waterfall: waterfall[row * fft_size + col], row 0 = newest
-    static constexpr int  WATERFALL_ROWS = 512;
+    static constexpr int  WATERFALL_ROWS = 64;
     std::vector<float>    waterfall;
 
     AppState()                           = default;

@@ -127,6 +127,14 @@ bool CaptureThread::configure_device() {
         return false;
     }
 
+    // hardware DC offset correction — zeros the I and Q DC bias on the mixer
+    // this reduces but doesn't fully eliminate the center spike
+    status = bladerf_set_correction(dev_, BLADERF_CHANNEL_RX(0), BLADERF_CORR_DCOFF_I, 0);
+    if (status != 0) log_error("dcoff_i", status); // non-fatal, continue
+
+    status = bladerf_set_correction(dev_, BLADERF_CHANNEL_RX(0), BLADERF_CORR_DCOFF_Q, 0);
+    if (status != 0) log_error("dcoff_q", status); // non-fatal, continue
+
     cout << "[capture] device configured\n";
     return true;
 }

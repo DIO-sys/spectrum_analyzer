@@ -152,6 +152,10 @@ void ProcessingThread::convert_to_dbm() {
     }
     psd_result_ = shifted;
 
+    // interpolate center bin to remove DC offset spike
+    // the center bin (bin N/2) is always artificially high on direct conversion receivers
+    psd_result_[half] = (psd_result_[half - 1] + psd_result_[half + 1]) / 2.0f;
+
     fill(welch_accum_.begin(), welch_accum_.end(), 0.0f);
 }
 
@@ -159,6 +163,7 @@ void ProcessingThread::publish_psd() {
     lock_guard<mutex> lock(state_.psd_mutex);
 
     state_.psd_dbm = psd_result_;
+    state_.total_frames.fetch_add(1);
 
     // resize waterfall if fft_size changed
     int total = AppState::WATERFALL_ROWS * fft_size_;
