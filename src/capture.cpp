@@ -1,6 +1,10 @@
 #include "capture.hpp"
+
 #include <libbladeRF.h>
 #include <iostream>
+#include <fstream>
+#include <ctime>
+#include <filesystem>
 
 using namespace std;
 
@@ -72,6 +76,12 @@ void CaptureThread::run() {
         }
 
         scale_and_push(raw_buf_.data(), TRANSFER_SAMPLES);
+
+        // check if UI requested a save
+        if (state_.save_requested.load()) {
+            save_iq_file();
+            state_.save_requested.store(false);
+        }
     }
 
     bladerf_enable_module(dev_, BLADERF_CHANNEL_RX(0), false);
@@ -169,4 +179,49 @@ void CaptureThread::scale_and_push(const int16_t* raw, unsigned int num_samples)
 void CaptureThread::log_error(const char* context, int status) {
     cerr << "[capture] " << context
          << " failed: " << bladerf_strerror(status) << "\n";
+}
+
+void CaptureThread::save_iq_file() {
+    // make sure data/ directory exists
+    filesystem::create_directories("../data");
+
+    // timestamp filename: data/iq_YYYYMMDD_HHMMSS_<freq>MHz.bin
+    time_t now = time(nullptr);
+    char ts[32];
+    strftime(ts, sizeof(ts), "%Y%m%d_%H%M%S", localtime(&now));
+
+    uint64_t freq_hz  = state_.center_freq_hz.load();
+    uint64_t freq_mhz = freq_hz / 1'000'000;
+
+    string path = string("../data/iq_") + ts + "_" +
+                  to_string(freq_mhz) + "MHz.bin";
+
+    ofstream f(path, ios::binary);
+    if (!f) {
+        cerr << "[capture] failed to open " << path << " for writing\n";
+        return;
+    }
+
+    // capture 1 second = SAMPLE_RATE_HZ samples
+    // stream directly to disk in TRANSFER_SAMPLES chunks
+    unsigned int total   = SAMPLE_RATE_HZ;
+    unsigned int written = 0;
+
+    cout << "[capture] saving " << total << " samples to " << path << "\n";
+
+    while (written < total && state_.running.load()) {
+        int status = bladerf_sync_rx(dev_, raw_buf_.data(), TRANSFER_SAMPLES,
+                                     nullptr, 5000);
+        if (status != 0) {
+            log_error("save bladerf_sync_rx", status);
+            break;
+        }
+        // write raw int16 interleaved IQ — NumPy reads this as np.int16
+        f.write(reinterpret_cast<const char*>(raw_buf_.data()),
+                TRANSFER_SAMPLES * 2 * sizeof(int16_t));
+        written += TRANSFER_SAMPLES;
+    }
+
+    f.close();
+    cout << "[capture] saved " << written << " samples to " << path << "\n";
 }

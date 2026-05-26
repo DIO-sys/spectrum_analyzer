@@ -17,7 +17,8 @@ struct AppState {
     std::atomic<bool>     peak_hold_reset { false }; // one-shot, cleared by processing
 
     std::atomic<bool>     running         { true };
-    std::atomic<int>      total_frames    { 0 };   // incremented by processing each Welch flush
+    std::atomic<int>      total_frames    { 0 };
+    std::atomic<bool>     save_requested  { false }; // one-shot: UI sets, capture thread clears
 
     // psd output — processing writes, display reads
     std::mutex            psd_mutex;

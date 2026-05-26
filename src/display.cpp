@@ -235,7 +235,7 @@ void DisplayThread::render_controls() {
     // row 1: freq slider + direct input, gain, fft size
     ImGui::SetNextItemWidth(260.0f);
     float freq_mhz = static_cast<float>(state_.center_freq_hz.load()) / 1e6f;
-    if (ImGui::SliderFloat("##freqslider", &freq_mhz, 0.0f, 3800.0f, "%.1f MHz")) {
+    if (ImGui::SliderFloat("##freqslider", &freq_mhz, 0.0f, 6000.0f, "%.1f MHz")) {
         state_.center_freq_hz.store(static_cast<uint64_t>(freq_mhz * 1e6f));
         freq_axis_.clear();
         state_.peak_hold_reset.store(true);
@@ -247,7 +247,7 @@ void DisplayThread::render_controls() {
     static float freq_input = freq_mhz;
     if (ImGui::InputFloat("MHz##input", &freq_input, 0.0f, 0.0f, "%.3f",
                           ImGuiInputTextFlags_EnterReturnsTrue)) {
-        freq_input = max(0.0f, min(3800.0f, freq_input)); // clamp to valid range
+        freq_input = max(0.0f, min(6000.0f, freq_input));
         state_.center_freq_hz.store(static_cast<uint64_t>(freq_input * 1e6f));
         freq_axis_.clear();
         state_.peak_hold_reset.store(true);
@@ -307,4 +307,10 @@ void DisplayThread::render_controls() {
                         SAMPLE_RATE / 1e6f,
                         static_cast<int>(1 << 18) / 1024,
                         state_.total_frames.load());
+
+    ImGui::SameLine();
+    if (ImGui::Button("Save IQ")) {
+        state_.save_requested.store(true);
+        cout << "[display] IQ save requested\n";
+    }
 }

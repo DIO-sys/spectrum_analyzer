@@ -19,6 +19,7 @@ CMakeFiles/spectrum_analyzer.dir/src/capture.cpp.o
  /usr/include/c++/15/backward/binders.h
  /usr/include/c++/15/bit
  /usr/include/c++/15/bits/alloc_traits.h
+ /usr/include/c++/15/bits/allocated_ptr.h
  /usr/include/c++/15/bits/allocator.h
  /usr/include/c++/15/bits/atomic_base.h
  /usr/include/c++/15/bits/atomic_lockfree_defines.h
@@ -29,6 +30,7 @@ CMakeFiles/spectrum_analyzer.dir/src/capture.cpp.o
  /usr/include/c++/15/bits/char_traits.h
  /usr/include/c++/15/bits/charconv.h
  /usr/include/c++/15/bits/chrono.h
+ /usr/include/c++/15/bits/codecvt.h
  /usr/include/c++/15/bits/concept_check.h
  /usr/include/c++/15/bits/cpp_type_traits.h
  /usr/include/c++/15/bits/cxxabi_forced.h
@@ -36,6 +38,11 @@ CMakeFiles/spectrum_analyzer.dir/src/capture.cpp.o
  /usr/include/c++/15/bits/exception.h
  /usr/include/c++/15/bits/exception_defines.h
  /usr/include/c++/15/bits/exception_ptr.h
+ /usr/include/c++/15/bits/fs_dir.h
+ /usr/include/c++/15/bits/fs_fwd.h
+ /usr/include/c++/15/bits/fs_ops.h
+ /usr/include/c++/15/bits/fs_path.h
+ /usr/include/c++/15/bits/fstream.tcc
  /usr/include/c++/15/bits/functexcept.h
  /usr/include/c++/15/bits/functional_hash.h
  /usr/include/c++/15/bits/hash_bytes.h
@@ -44,8 +51,11 @@ CMakeFiles/spectrum_analyzer.dir/src/capture.cpp.o
  /usr/include/c++/15/bits/istream.tcc
  /usr/include/c++/15/bits/locale_classes.h
  /usr/include/c++/15/bits/locale_classes.tcc
+ /usr/include/c++/15/bits/locale_conv.h
  /usr/include/c++/15/bits/locale_facets.h
  /usr/include/c++/15/bits/locale_facets.tcc
+ /usr/include/c++/15/bits/locale_facets_nonio.h
+ /usr/include/c++/15/bits/locale_facets_nonio.tcc
  /usr/include/c++/15/bits/localefwd.h
  /usr/include/c++/15/bits/memory_resource.h
  /usr/include/c++/15/bits/memoryfwd.h
@@ -59,9 +69,12 @@ CMakeFiles/spectrum_analyzer.dir/src/capture.cpp.o
  /usr/include/c++/15/bits/postypes.h
  /usr/include/c++/15/bits/predefined_ops.h
  /usr/include/c++/15/bits/ptr_traits.h
+ /usr/include/c++/15/bits/quoted_string.h
  /usr/include/c++/15/bits/range_access.h
  /usr/include/c++/15/bits/refwrap.h
  /usr/include/c++/15/bits/requires_hosted.h
+ /usr/include/c++/15/bits/shared_ptr.h
+ /usr/include/c++/15/bits/shared_ptr_base.h
  /usr/include/c++/15/bits/specfun.h
  /usr/include/c++/15/bits/sstream.tcc
  /usr/include/c++/15/bits/std_abs.h
@@ -81,6 +94,7 @@ CMakeFiles/spectrum_analyzer.dir/src/capture.cpp.o
  /usr/include/c++/15/bits/string_view.tcc
  /usr/include/c++/15/bits/stringfwd.h
  /usr/include/c++/15/bits/unique_lock.h
+ /usr/include/c++/15/bits/unique_ptr.h
  /usr/include/c++/15/bits/uses_allocator.h
  /usr/include/c++/15/bits/uses_allocator_args.h
  /usr/include/c++/15/bits/utility.h
@@ -90,6 +104,7 @@ CMakeFiles/spectrum_analyzer.dir/src/capture.cpp.o
  /usr/include/c++/15/cerrno
  /usr/include/c++/15/clocale
  /usr/include/c++/15/cmath
+ /usr/include/c++/15/codecvt
  /usr/include/c++/15/complex
  /usr/include/c++/15/concepts
  /usr/include/c++/15/cstddef
@@ -102,17 +117,23 @@ CMakeFiles/spectrum_analyzer.dir/src/capture.cpp.o
  /usr/include/c++/15/debug/assertions.h
  /usr/include/c++/15/debug/debug.h
  /usr/include/c++/15/exception
+ /usr/include/c++/15/ext/aligned_buffer.h
  /usr/include/c++/15/ext/alloc_traits.h
  /usr/include/c++/15/ext/atomicity.h
+ /usr/include/c++/15/ext/concurrence.h
  /usr/include/c++/15/ext/numeric_traits.h
  /usr/include/c++/15/ext/string_conversions.h
  /usr/include/c++/15/ext/type_traits.h
+ /usr/include/c++/15/filesystem
+ /usr/include/c++/15/fstream
  /usr/include/c++/15/initializer_list
+ /usr/include/c++/15/iomanip
  /usr/include/c++/15/ios
  /usr/include/c++/15/iosfwd
  /usr/include/c++/15/iostream
  /usr/include/c++/15/istream
  /usr/include/c++/15/limits
+ /usr/include/c++/15/locale
  /usr/include/c++/15/mutex
  /usr/include/c++/15/new
  /usr/include/c++/15/ostream
@@ -148,6 +169,7 @@ CMakeFiles/spectrum_analyzer.dir/src/capture.cpp.o
  /usr/include/features.h
  /usr/include/inttypes.h
  /usr/include/libbladeRF.h
+ /usr/include/libintl.h
  /usr/include/linux/errno.h
  /usr/include/linux/posix_types.h
  /usr/include/linux/sched/types.h
@@ -241,8 +263,10 @@ CMakeFiles/spectrum_analyzer.dir/src/capture.cpp.o
  /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h
  /usr/include/x86_64-linux-gnu/bits/wordsize.h
  /usr/include/x86_64-linux-gnu/c++/15/bits/atomic_word.h
+ /usr/include/x86_64-linux-gnu/c++/15/bits/basic_file.h
  /usr/include/x86_64-linux-gnu/c++/15/bits/c++allocator.h
  /usr/include/x86_64-linux-gnu/c++/15/bits/c++config.h
+ /usr/include/x86_64-linux-gnu/c++/15/bits/c++io.h
  /usr/include/x86_64-linux-gnu/c++/15/bits/c++locale.h
  /usr/include/x86_64-linux-gnu/c++/15/bits/cpu_defines.h
  /usr/include/x86_64-linux-gnu/c++/15/bits/ctype_base.h
@@ -250,7 +274,9 @@ CMakeFiles/spectrum_analyzer.dir/src/capture.cpp.o
  /usr/include/x86_64-linux-gnu/c++/15/bits/error_constants.h
  /usr/include/x86_64-linux-gnu/c++/15/bits/gthr-default.h
  /usr/include/x86_64-linux-gnu/c++/15/bits/gthr.h
+ /usr/include/x86_64-linux-gnu/c++/15/bits/messages_members.h
  /usr/include/x86_64-linux-gnu/c++/15/bits/os_defines.h
+ /usr/include/x86_64-linux-gnu/c++/15/bits/time_members.h
  /usr/include/x86_64-linux-gnu/gnu/stubs-64.h
  /usr/include/x86_64-linux-gnu/gnu/stubs.h
  /usr/include/x86_64-linux-gnu/sys/cdefs.h

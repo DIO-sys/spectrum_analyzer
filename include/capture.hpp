@@ -21,6 +21,7 @@ private:
     void close_device();
     void scale_and_push(const int16_t* raw, unsigned int num_samples);
     void log_error(const char* context, int status);
+    void save_iq_file();
 
     CircularBuffer<std::complex<float>>& buf_;
     AppState&                            state_;
