@@ -14,7 +14,7 @@ CaptureThread::~CaptureThread() {
     close_device();
 }
 
-//public 
+// public
 
 void CaptureThread::run() {
     cout << "[capture] starting\n";
@@ -24,9 +24,10 @@ void CaptureThread::run() {
         return;
     }
 
-    int status = bladerf_start_rx(dev_, BLADERF_MODULE_RX, nullptr, nullptr);
+    // enable RX front end after sync_config, before sync_rx
+    int status = bladerf_enable_module(dev_, BLADERF_CHANNEL_RX(0), true);
     if (status != 0) {
-        log_error("start_rx", status);
+        log_error("enable_module RX", status);
         state_.running.store(false);
         return;
     }
@@ -34,18 +35,18 @@ void CaptureThread::run() {
     cout << "[capture] streaming\n";
 
     while (state_.running.load()) {
-        // check if center freq or gain changed since last iteration
+        // pick up freq/gain changes from UI
         uint64_t freq = state_.center_freq_hz.load();
         int      gain = state_.gain_db.load();
 
-        status = bladerf_set_frequency(dev_, BLADERF_MODULE_RX, freq);
+        status = bladerf_set_frequency(dev_, BLADERF_CHANNEL_RX(0), freq);
         if (status != 0) {
             log_error("set_frequency", status);
             state_.running.store(false);
             break;
         }
 
-        status = bladerf_set_gain(dev_, BLADERF_MODULE_RX, gain);
+        status = bladerf_set_gain(dev_, BLADERF_CHANNEL_RX(0), gain);
         if (status != 0) {
             log_error("set_gain", status);
             state_.running.store(false);
@@ -53,10 +54,10 @@ void CaptureThread::run() {
         }
 
         // blocking read — fills raw_buf_ with interleaved int16 I/Q pairs
-        status = bladerf_rx(dev_, BLADERF_FORMAT_SC16_Q11,
-                            raw_buf_.data(), TRANSFER_SAMPLES, nullptr);
-        if (status < 0) {
-            log_error("bladerf_rx", status);
+        status = bladerf_sync_rx(dev_, raw_buf_.data(), TRANSFER_SAMPLES,
+                                 nullptr, 3500);
+        if (status != 0) {
+            log_error("bladerf_sync_rx", status);
             state_.running.store(false);
             break;
         }
@@ -64,11 +65,11 @@ void CaptureThread::run() {
         scale_and_push(raw_buf_.data(), TRANSFER_SAMPLES);
     }
 
-    bladerf_stop_rx(dev_, BLADERF_MODULE_RX, nullptr);
+    bladerf_enable_module(dev_, BLADERF_CHANNEL_RX(0), false);
     cout << "[capture] exiting\n";
 }
 
-//private 
+// private
 
 bool CaptureThread::open_device() {
     int status = bladerf_open(&dev_, nullptr); // nullptr = first device found
@@ -83,9 +84,8 @@ bool CaptureThread::open_device() {
 bool CaptureThread::configure_device() {
     int status;
 
-    // sample rate
     uint32_t actual_rate = 0;
-    status = bladerf_set_sample_rate(dev_, BLADERF_MODULE_RX,
+    status = bladerf_set_sample_rate(dev_, BLADERF_CHANNEL_RX(0),
                                      SAMPLE_RATE_HZ, &actual_rate);
     if (status != 0) {
         log_error("set_sample_rate", status);
@@ -93,38 +93,35 @@ bool CaptureThread::configure_device() {
     }
     cout << "[capture] sample rate: " << actual_rate << " sps\n";
 
-    // bandwidth
     uint32_t actual_bw = 0;
-    status = bladerf_set_bandwidth(dev_, BLADERF_MODULE_RX,
+    status = bladerf_set_bandwidth(dev_, BLADERF_CHANNEL_RX(0),
                                    BANDWIDTH_HZ, &actual_bw);
     if (status != 0) {
         log_error("set_bandwidth", status);
         return false;
     }
 
-    // initial center frequency from AppState
-    status = bladerf_set_frequency(dev_, BLADERF_MODULE_RX,
+    status = bladerf_set_frequency(dev_, BLADERF_CHANNEL_RX(0),
                                    state_.center_freq_hz.load());
     if (status != 0) {
         log_error("set_frequency (init)", status);
         return false;
     }
 
-    // initial gain
-    status = bladerf_set_gain(dev_, BLADERF_MODULE_RX, state_.gain_db.load());
+    status = bladerf_set_gain(dev_, BLADERF_CHANNEL_RX(0), state_.gain_db.load());
     if (status != 0) {
         log_error("set_gain (init)", status);
         return false;
     }
 
-    // sync config — tells the driver our transfer size and buffer count
-    // 16 buffers × 4096 samples gives ~1.6ms of USB-level buffering
-    status = bladerf_sync_config(dev_, BLADERF_MODULE_RX,
+    // BLADERF_RX_X1 = single channel layout (SISO)
+    // must be called before bladerf_enable_module
+    status = bladerf_sync_config(dev_, BLADERF_RX_X1,
                                  BLADERF_FORMAT_SC16_Q11,
-                                 16,              // num_buffers
+                                 16,               // num_buffers
                                  TRANSFER_SAMPLES,
-                                 8,               // num_transfers
-                                 3500);           // timeout ms
+                                 8,                // num_transfers
+                                 3500);            // timeout ms
     if (status != 0) {
         log_error("sync_config", status);
         return false;
@@ -143,7 +140,7 @@ void CaptureThread::close_device() {
 }
 
 void CaptureThread::scale_and_push(const int16_t* raw, unsigned int num_samples) {
-    // BladeRF SC16_Q11 format: interleaved int16 pairs, range [-2048, 2047]
+    // SC16_Q11: interleaved int16 pairs, range [-2048, 2047]
     // divide by 2048.0f to normalize to (-1.0, +1.0)
     for (unsigned int i = 0; i < num_samples; ++i) {
         float i_val = raw[i * 2]     / 2048.0f;

@@ -17,18 +17,20 @@ private:
     void rebuild_plan(int new_fft_size);
     void apply_hann_window();
     void accumulate_frame();
-    void flush_welch();
+    void average_welch();    // divide accumulator by frame count
+    void convert_to_dbm();   // apply formula + fftshift into psd_result_
+    void publish_psd();      // lock mutex, write to AppState and waterfall
     void update_peak();
 
     CircularBuffer<std::complex<float>>& buf_;
     AppState&                            state_;
 
     int            fft_size_{ 0 };
-    //time domain samples before fft
+    // time domain samples before fft
     fftwf_complex* fftw_in_ { nullptr };
-    //frequency domain samples after fft
+    // frequency domain samples after fft
     fftwf_complex* fftw_out_{ nullptr };
-    //optimized fft configuration
+    // optimized fft configuration
     fftwf_plan     plan_    { nullptr };
 
     // batch popped from the ring buffer each iteration

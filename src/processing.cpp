@@ -45,16 +45,20 @@ void ProcessingThread::run() {
             fftw_in_[k][0] = batch_[k].real();
             fftw_in_[k][1] = batch_[k].imag();
         }
-        //transform from fft in to fft out
+
+        // transform from fft_in to fft_out
         fftwf_execute(plan_);
-        //put those new samples into the welch accumulate
-        accumulate_frame();  // |X[k]|^2 into welch_accum_
+
+        // put those new samples into the welch accumulator
+        accumulate_frame();
 
         ++frame_count_;
-            //augment frames until desired #
-            //when reached, send to display thread
+        // augment frames until desired #
+        // when reached, send to display thread
         if (frame_count_ >= WELCH_FRAMES) {
-            flush_welch();   // average, convert to dBm, push to AppState
+            average_welch();
+            convert_to_dbm();
+            publish_psd();
             update_peak();
             frame_count_ = 0;
         }
@@ -63,16 +67,16 @@ void ProcessingThread::run() {
     cout << "[processing] exiting\n";
 }
 
-//private 
+// private
+
 void ProcessingThread::rebuild_plan(int new_fft_size) {
-    // free old resources
     if (plan_)     fftwf_destroy_plan(plan_);
     if (fftw_in_)  fftwf_free(fftw_in_);
     if (fftw_out_) fftwf_free(fftw_out_);
 
     fft_size_ = new_fft_size;
 
-    // fftw_malloc gives aligned memory — FFTW uses SIMD internally
+    // fftwf_malloc gives aligned memory — FFTW uses SIMD internally
     fftw_in_  = reinterpret_cast<fftwf_complex*>(
                     fftwf_malloc(sizeof(fftwf_complex) * fft_size_));
     fftw_out_ = reinterpret_cast<fftwf_complex*>(
@@ -93,7 +97,6 @@ void ProcessingThread::rebuild_plan(int new_fft_size) {
         return;
     }
 
-    // resize working buffers
     batch_.resize(fft_size_);
     welch_accum_.assign(fft_size_, 0.0f);
     psd_result_.resize(fft_size_);
@@ -109,8 +112,7 @@ void ProcessingThread::rebuild_plan(int new_fft_size) {
 }
 
 void ProcessingThread::apply_hann_window() {
-    // multiply each complex sample by the real-valued window coefficient
-    // this tapers the edges of the batch to zero, reducing spectral leakage
+    // tapers edges of batch to zero, reducing spectral leakage
     for (int n = 0; n < fft_size_; ++n)
         batch_[n] *= hann_window_[n];
 }
@@ -124,10 +126,74 @@ void ProcessingThread::accumulate_frame() {
     }
 }
 
-void ProcessingThread::flush_welch() {
-    // TODO phase 5 — average welch_accum_, convert to dBm, push to AppState
+void ProcessingThread::average_welch() {
+    float frames = static_cast<float>(WELCH_FRAMES);
+    for (int k = 0; k < fft_size_; ++k)
+        welch_accum_[k] /= frames;
+}
+
+void ProcessingThread::convert_to_dbm() {
+    float cal = state_.cal_offset_db.load();
+    float n2  = static_cast<float>(fft_size_) * static_cast<float>(fft_size_);
+
+    for (int k = 0; k < fft_size_; ++k) {
+        // power_dBm = 10 * log10(|X[k]|^2 / N^2) + calibration_offset
+        // clamp to avoid log10(0) = -inf
+        float power = welch_accum_[k] / n2;
+        psd_result_[k] = 10.0f * log10f(power > 1e-20f ? power : 1e-20f) + cal;
+    }
+
+    // fftshift: swap halves so DC is centered, negative freqs on the left
+    int half = fft_size_ / 2;
+    vector<float> shifted(fft_size_);
+    for (int k = 0; k < half; ++k) {
+        shifted[k]        = psd_result_[k + half];
+        shifted[k + half] = psd_result_[k];
+    }
+    psd_result_ = shifted;
+
+    fill(welch_accum_.begin(), welch_accum_.end(), 0.0f);
+}
+
+void ProcessingThread::publish_psd() {
+    lock_guard<mutex> lock(state_.psd_mutex);
+
+    state_.psd_dbm = psd_result_;
+
+    // resize waterfall if fft_size changed
+    int total = AppState::WATERFALL_ROWS * fft_size_;
+    if (static_cast<int>(state_.waterfall.size()) != total)
+        state_.waterfall.assign(total, -120.0f);
+
+    // shift rows down, insert new row at top (row 0 = newest)
+    move_backward(state_.waterfall.begin(),
+                  state_.waterfall.end() - fft_size_,
+                  state_.waterfall.end());
+    copy(psd_result_.begin(), psd_result_.end(), state_.waterfall.begin());
 }
 
 void ProcessingThread::update_peak() {
-    // TODO phase 6
+    if (!state_.peak_hold_on.load()) return;
+
+    // one-shot reset
+    // basically on reset, for each frequency bin, set it to -200 dBm which is below the noise floor.
+    if (state_.peak_hold_reset.load()) {
+        lock_guard<mutex> lock(state_.psd_mutex);
+        fill(state_.peak_dbm.begin(), state_.peak_dbm.end(), -200.0f);
+        // turn off the reset flag so that it doesn't keep resetting every update.
+        state_.peak_hold_reset.store(false);
+        return;
+    }
+
+    lock_guard<mutex> lock(state_.psd_mutex);
+    // if the peak hold array size doesn't match the current PSD size (because user changed FFT size)
+    // resize it and fill with -200 dBm (no peaks).
+    if (state_.peak_dbm.size() != state_.psd_dbm.size())
+        state_.peak_dbm.assign(state_.psd_dbm.size(), -200.0f);
+
+    // go through each frequency and compare current and "highest"
+    for (size_t k = 0; k < state_.psd_dbm.size(); ++k) {
+        if (state_.psd_dbm[k] > state_.peak_dbm[k])
+            state_.peak_dbm[k] = state_.psd_dbm[k];
+    }
 }
