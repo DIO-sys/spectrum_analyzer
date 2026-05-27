@@ -26,8 +26,8 @@ This project demonstrates real-time DSP pipeline architecture, lock-free concurr
 **Python PSD Plot — synthetic tone at 920 MHz with noise floor overlay**
 ![PSD Plot](noise_floor_python.png)
 
-**Python V2X Spectrogram — synthetic interference event characterization**
-![V2X Analysis](v2x_python.png)
+**Python V2X Spectrogram — synthetic interference event characterization (top words muddled but the center is 5900 Megahertz)**
+![V2X Analysis](v2x_spectrogram.png)
 
 ---
 
