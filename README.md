@@ -9,22 +9,25 @@ This project demonstrates real-time DSP pipeline architecture, lock-free concurr
 ## Screenshots
 
 **FM Band (88 MHz) — multiple stations visible as persistent carriers**
-![FM Band](docs/screenshots/fm_88mhz.png)
+![FM Band](fm_band.png)
 
 **868 MHz ISM Band — LoRa/smart meter activity with burst events**
-![868 MHz](docs/screenshots/ism_868mhz.png)
+![868 MHz](ism_868.png)
 
 **2.4 GHz — WiFi carrier with peak hold**
-![2.4 GHz WiFi](docs/screenshots/wifi_2400mhz.png)
+![2.4 GHz WiFi](wifi_2400.png)
 
 **915 MHz — peak hold showing historical signal envelope**
-![915 MHz Peak Hold](docs/screenshots/peak_hold_915mhz.png)
+![915 MHz Peak Hold](peak_hold_915.png)
+
+**743 MHz — two persistent carriers visible**
+![743 MHz](signals_743.png)
 
 **Python PSD Plot — synthetic tone at 920 MHz with noise floor overlay**
-![PSD Plot](docs/screenshots/psd_python.png)
+![PSD Plot](psd_python.png)
 
 **Python V2X Spectrogram — synthetic interference event characterization**
-![V2X Analysis](docs/screenshots/v2x_python.png)
+![V2X Analysis](v2x_python.png)
 
 ---
 
