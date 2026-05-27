@@ -1,2 +1,17 @@
 data/*.bin
 build/
+# Build
+build/
+
+# IDE
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Runtime artifacts
+imgui.ini
+*.rbf
