@@ -104,7 +104,7 @@ bladeRF-cli -l hostedxA4.rbf
 
 ## Python Scripts
 
-Generate synthetic test data and analyze offline IQ captures.
+Generate synthetic test data and analyze offline IQ captures. Synthetic generation in order to bypass hardware artifact error
 
 **PSD analysis:**
 ```bash
