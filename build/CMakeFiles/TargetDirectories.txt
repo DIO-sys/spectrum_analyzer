@@ -1,4 +1,0 @@
-/home/timodagoat/code/spectrum_analyzer/build/CMakeFiles/imgui.dir
-/home/timodagoat/code/spectrum_analyzer/build/CMakeFiles/spectrum_analyzer.dir
-/home/timodagoat/code/spectrum_analyzer/build/CMakeFiles/edit_cache.dir
-/home/timodagoat/code/spectrum_analyzer/build/CMakeFiles/rebuild_cache.dir
