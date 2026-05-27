@@ -11,16 +11,26 @@ Built on a BladeRF 2.0 Micro xA4, streaming 40 MSPS through a lock-free producer
 
 ## Screenshots
 
-**FM Band (88 MHz) — multiple FM stations visible as persistent carriers**
+**FM Band (88–108 MHz) — each spike is a distinct FM station. Persistent carriers 
+with stable amplitude confirm clean reception. This is what a known-good signal 
+looks like on the waterfall — used as a sanity check before tuning to a working frequency.**
 ![FM Band](result_photos/fm_band.png)
 
-**743 MHz — two persistent carriers visible**
+**743 MHz — two narrowband carriers visible as persistent vertical lines on the 
+waterfall. Unidentified persistent carriers like these are exactly what you want 
+to find before transmitting — they tell you the band is occupied before you 
+waste time debugging a collision.**
 ![743 MHz](result_photos/signals_743.png)
 
-**Python PSD Plot — synthetic tone at 920 MHz with noise floor overlay**
+**Python PSD Plot — synthetic two-tone test at 920 MHz with noise floor overlay. 
+The gap between the signal peak and the noise floor is the SNR. Used offline to 
+validate the dBm calibration math against known input power.**
 ![PSD Plot](result_photos/noise_floor_python.png)
 
-**Python V2X Spectrogram — synthetic interference event characterization**
+**Python V2X Spectrogram — synthetic interference burst characterization at 5.9 GHz. 
+The C-V2X band sits here. Horizontal axis is time, vertical is frequency — the 
+bright horizontal streaks are interference events. This analysis script was built 
+to characterize the RF environment before any V2X transmission.**
 ![V2X Analysis](result_photos/v2x_spectrogram.png)
 
 ---
