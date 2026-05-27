@@ -205,3 +205,8 @@ spectrum_analyzer/
 - [Dear ImGui](https://github.com/ocornut/imgui)
 - [ImPlot](https://github.com/epezent/implot)
 - Welch, P.D. (1967). "The use of fast Fourier transform for the estimation of power spectra." *IEEE Transactions on Audio and Electroacoustics.*
+
+
+## Documentation
+
+- [Architecture](ARCHITECTURE.md) — threading model, DSP pipeline, design decisions
