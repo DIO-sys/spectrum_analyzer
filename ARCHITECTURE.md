@@ -24,7 +24,7 @@ BladeRF → raw int16 SC16_Q11 → ÷ 2048.0f → complex<float>
                               architecture decisions begin here
 ```
 
-The BladeRF delivers signed 16-bit interleaved IQ pairs in SC16_Q11 format — range −2048 to +2047. Dividing by `2048.0f` produces normalized complex floats in (−1.0, +1.0). Once samples are in `complex<float>`, they are mathematically first-class signal data. From this point forward every decision — windowing function, averaging method, FFT size, buffer geometry — is a DSP and systems design choice with measurable engineering tradeoffs.
+The BladeRF delivers signed 16-bit interleaved IQ pairs in SC16_Q11 format — range −2048 to +2047. Dividing by `2048.0f` produces normalized complex floats in (−1.0, +1.0). Once samples are in `complex<float>`, they are mathematically first-class signal data. From this point forward every decision like the windowing function, averaging method, FFT size, buffer geometry all is a DSP and systems design choice with measurable engineering tradeoffs.
 
 ---
 
