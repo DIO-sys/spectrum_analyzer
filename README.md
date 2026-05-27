@@ -17,14 +17,14 @@ This project demonstrates real-time DSP pipeline architecture, lock-free concurr
 **2.4 GHz — WiFi carrier with peak hold**
 ![2.4 GHz WiFi](wifi_2400.png)
 
-**915 MHz — peak hold showing historical signal envelope**
+**915 MHz — peak hold showing historical signal envelope (hot colormap)**
 ![915 MHz Peak Hold](peak_hold_915.png)
 
 **743 MHz — two persistent carriers visible**
 ![743 MHz](signals_743.png)
 
 **Python PSD Plot — synthetic tone at 920 MHz with noise floor overlay**
-![PSD Plot](psd_python.png)
+![PSD Plot](noise_floor_python.png)
 
 **Python V2X Spectrogram — synthetic interference event characterization**
 ![V2X Analysis](v2x_python.png)
