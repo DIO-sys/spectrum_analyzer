@@ -1,10 +1,13 @@
 # Spectrum Analyzer
-
-Real-time RF spectrum analyzer built on a BladeRF 2.0 Micro xA4. Streams IQ samples at 40 MSPS through a lock-free producer/consumer pipeline, applies Hann windowing and FFTW3 transforms, averages with Welch's method, and renders a live PSD graph and scrolling waterfall display via Dear ImGui and ImPlot. Covers 50 MHz to 6 GHz. Includes Python scripts for offline IQ analysis and V2X band interference characterization.
-
-This project demonstrates real-time DSP pipeline architecture, lock-free concurrent systems programming in C++17, hardware integration via libbladeRF, and RF measurement fundamentals — the same foundational stack used in electronic warfare, radar, and signals intelligence systems.
-
+ 
+This project exists because of a $300 mistake. While building a 4G LTE network on a BladeRF using srsRAN, corrupted packets from the radio cost five weeks of debugging with no clear path to the root cause. The problem was simple in hindsight — there was no way to verify the RF environment before sending signals into it. No clean frequency, no communication. This is the unsexy work that underpins everything in radio frequency engineering.
+ 
+The fix was a spectrum analyzer. Before transmitting anything, you need to see the full picture — where the spectrum is clean, where it's noisy, and where interference is already living. A waterfall and PSD plot gives you that. Consistent coloration means clean signal. Discoloration and noise means something is wrong before a single packet leaves the radio.
+ 
+Built on a BladeRF 2.0 Micro xA4, streaming 40 MSPS through a lock-free producer/consumer pipeline in C++17, with Hann windowing, FFTW3 transforms, and Welch averaging for a stable noise floor. Live PSD and scrolling waterfall rendered via Dear ImGui and ImPlot. Covers 50 MHz to 6 GHz. Includes Python scripts for offline IQ analysis and V2X band interference characterization.
+ 
 ---
+
 
 ## Screenshots
 
