@@ -1,4 +1,4 @@
-m# Spectrum Analyzer
+Spectrum Analyzer
  
 This project exists because of a $300 mistake. While building a 4G LTE network on a BladeRF using srsRAN, corrupted packets from the radio cost five weeks of debugging with no clear path to the root cause. The problem was simple in hindsight — there was no way to verify the RF environment before sending signals into it. No clean frequency, no communication. This is the mundane work that underpins everything in radio frequency engineering.
  
