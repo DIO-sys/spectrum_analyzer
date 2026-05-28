@@ -15,3 +15,6 @@ Thumbs.db
 # Runtime artifacts
 imgui.ini
 *.rbf
+
+#Third Party Dependencies
+third_party/
