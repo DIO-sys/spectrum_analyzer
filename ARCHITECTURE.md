@@ -10,7 +10,7 @@
 
 A real-time RF spectrum analyzer streaming 40 million IQ samples per second from a software-defined radio into a live power spectral density display. The system is built around a three-thread producer/consumer pipeline with a lock-free circular buffer at its core, a Welch-averaged FFTW3 DSP chain optimized for a clean noise floor, and an immediate-mode GPU-rendered display via Dear ImGui and ImPlot.
 
-The primary design goal was interference detection — specifically characterizing signal activity in the 5.9 GHz C-V2X band. Every architectural decision downstream of IQ normalization is oriented toward that goal: maximizing noise floor stability over frequency resolution precision.
+The primary design goal was interference detection, specifically characterizing signal activity in the 5.9 GHz C-V2X band. Every architectural decision downstream of IQ normalization is oriented towards maximizing noise floor stability over frequency resolution precision.
 
 ---
 
@@ -72,13 +72,13 @@ alignas(64) std::atomic<size_t> read_pos_ { 0 };
 
 ### Hann windowing — choosing noise floor over resolution
 
-The FFT assumes its input is periodic — it wraps the end of each batch back to the beginning. Real-world signal batches do not start and end at the same amplitude. The discontinuity at the wrap point is interpreted as high-frequency energy — spectral leakage — which raises the noise floor across the entire spectrum. The Hann window tapers both ends of each batch to zero, eliminating the discontinuity.
+The FFT assumes its input is periodic, or that it wraps the end of each batch back to the beginning. Real-world signal batches do not start and end at the same amplitude. The discontinuity at the wrap point is interpreted as high-frequency energy otherwise known asspectral leakage that can  raises the noise floor across the entire spectrum. The Hann window tapers both ends of each batch to zero, eliminating the discontinuity.
 
 ```
 w[n] = 0.5 * (1 − cos(2πn / (N−1)))
 ```
 
-**The tradeoff.** Windowing slightly widens the main lobe of any signal peak — a sharp tone appears as a narrow hill rather than a single bin spike. This trades frequency precision for noise floor stability. For interference detection that tradeoff is correct: a cleaner floor makes weak interference events visible above background.
+**The tradeoff.** Windowing slightly widens the main lobe of any signal peak and a sharp tone appears as a narrow hill rather than a single bin spike. This trades frequency precision for noise floor stability. This benefits specifically interference detection
 
 **Alternatives considered:**
 
