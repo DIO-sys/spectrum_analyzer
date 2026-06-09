@@ -1,8 +1,8 @@
 ## Spectrum Analyzer
  
-This project exists because of a $300 mistake. While building a 4G LTE network on a BladeRF using srsRAN, corrupted packets from the radio cost five weeks of debugging with no clear path to the root cause. The problem was simple in hindsight — there was no way to verify the RF environment before sending signals into it. No clean frequency, no communication. This is the mundane work that underpins everything in radio frequency engineering.
+This project exists because of a $300 mistake. While building a 4G LTE network on a BladeRF using srsRAN, corrupted packets from the radio cost five weeks of debugging with no clear path to the root cause. The problem was simple looking back on it there was no way to verify the RF environment before sending signals into it. No clean frequency, no communication. This is the mundane work that comes before everything in radio frequency engineering.
  
-The fix was a spectrum analyzer. Before transmitting anything, you need to see the full picture — where the spectrum is clean, where it's noisy, and where interference is already living. A waterfall and PSD plot gives you that. Consistent coloration means clean signal. Discoloration and noise means something is wrong before a single packet leaves the radio.
+The fix was a spectrum analyzer. Before transmitting anything, it's important to see the whole picture such as where the spectrum is clean, where it's noisy, and where interference is already living. A waterfall and PSD plotprovides that Consistent coloration means clean signal. Discoloration and noise means something is wrong before anything even comes out of the radio.
  
 Built on a BladeRF 2.0 Micro xA4, streaming 40 MSPS through a lock-free producer/consumer pipeline in C++17, with Hann windowing, FFTW3 transforms, and Welch averaging for a stable noise floor. Live PSD and scrolling waterfall rendered via Dear ImGui and ImPlot. Covers 50 MHz to 6 GHz. Includes Python scripts for offline IQ analysis and V2X band interference characterization.
  
